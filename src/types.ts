@@ -1,6 +1,14 @@
+export type Habit = {
+  id: string;
+  name: string;
+  category: string;
+};
+
 export type HabitTask = {
   id: string;
   title: string;
-  type: string;
+  habitId: string;
   completedDates: string[];
 };
+
+export type TabKey = "overview" | "activity" | "tasks";

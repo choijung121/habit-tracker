@@ -8,9 +8,16 @@ import { getShadeColor, toDateKey } from "../utils/habits";
 type ActivityGridProps = {
   calendarDays: Date[];
   dailyCounts: Record<string, number>;
+  title?: string;
+  subtitle?: string;
 };
 
-export function ActivityGrid({ calendarDays, dailyCounts }: ActivityGridProps) {
+export function ActivityGrid({
+  calendarDays,
+  dailyCounts,
+  title = "Activity",
+  subtitle = `Last ${GRID_WEEKS} weeks`,
+}: ActivityGridProps) {
   const weekColumns = useMemo(() => {
     const columns: Date[][] = [];
 
@@ -31,8 +38,8 @@ export function ActivityGrid({ calendarDays, dailyCounts }: ActivityGridProps) {
     <View style={styles.sectionCard}>
       <View style={styles.sectionHeader}>
         <View>
-          <Text style={styles.sectionTitle}>Activity</Text>
-          <Text style={styles.sectionSubtitle}>Last {GRID_WEEKS} weeks</Text>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <Text style={styles.sectionSubtitle}>{subtitle}</Text>
         </View>
         <View style={styles.legend}>
           <Text style={styles.legendText}>Less</Text>

@@ -5,13 +5,37 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F4F7F1",
   },
+  screen: {
+    flex: 1,
+  },
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 32,
+    paddingTop: 12,
+    paddingBottom: 150,
     gap: 18,
   },
+  pageHeader: {
+    gap: 8,
+  },
+  eyebrow: {
+    color: "#7B8D72",
+    fontSize: 13,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  pageTitle: {
+    color: "#1F3120",
+    fontSize: 34,
+    fontWeight: "700",
+  },
+  pageSubtitle: {
+    color: "#7D8B77",
+    fontSize: 15,
+    lineHeight: 22,
+    maxWidth: 320,
+  },
   heroCard: {
-    marginTop: 12,
     backgroundColor: "#17351A",
     borderRadius: 28,
     padding: 22,
@@ -20,46 +44,17 @@ export const styles = StyleSheet.create({
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 12 },
   },
-  heroTopRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  eyebrow: {
-    color: "#B6D6B0",
-    fontSize: 13,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-  },
   heroTitle: {
-    marginTop: 8,
     color: "#F6F8F2",
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "700",
-    maxWidth: 240,
-    lineHeight: 38,
+    lineHeight: 34,
   },
   heroSubtitle: {
-    marginTop: 14,
+    marginTop: 10,
     color: "#D0E1CB",
     fontSize: 15,
     lineHeight: 22,
-    maxWidth: 290,
-  },
-  plusButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: "#95CB68",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  plusButtonText: {
-    color: "#17351A",
-    fontSize: 30,
-    fontWeight: "400",
-    marginTop: -2,
   },
   statRow: {
     flexDirection: "row",
@@ -92,6 +87,10 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: 12,
+  },
+  sectionHeaderStack: {
+    gap: 2,
   },
   sectionTitle: {
     color: "#1F3120",
@@ -163,6 +162,33 @@ export const styles = StyleSheet.create({
     height: 14,
     borderRadius: 4,
   },
+  categorySection: {
+    gap: 12,
+  },
+  categoryHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  categoryBadge: {
+    backgroundColor: "#E5EFDA",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    alignSelf: "flex-start",
+  },
+  categoryBadgeText: {
+    color: "#436535",
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  categoryCount: {
+    color: "#7D8B77",
+    fontSize: 13,
+    fontWeight: "600",
+  },
   taskCard: {
     backgroundColor: "#FCFDF9",
     borderRadius: 24,
@@ -170,10 +196,11 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: 14,
   },
   taskInfo: {
     flex: 1,
-    paddingRight: 16,
+    paddingRight: 8,
   },
   taskTypeBadge: {
     alignSelf: "flex-start",
@@ -194,6 +221,12 @@ export const styles = StyleSheet.create({
     color: "#1F3120",
     fontSize: 18,
     fontWeight: "700",
+  },
+  taskHabitName: {
+    color: "#4A6643",
+    fontSize: 14,
+    marginTop: 4,
+    fontWeight: "600",
   },
   taskMeta: {
     color: "#7D8B77",
@@ -237,6 +270,66 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: -6,
   },
+  summaryGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  summaryCard: {
+    width: "47%",
+    backgroundColor: "#FCFDF9",
+    borderRadius: 22,
+    padding: 18,
+    gap: 8,
+  },
+  summaryLabel: {
+    color: "#7D8B77",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  summaryValue: {
+    color: "#1F3120",
+    fontSize: 26,
+    fontWeight: "700",
+  },
+  summaryAccent: {
+    color: "#4C6D42",
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  habitRow: {
+    backgroundColor: "#FCFDF9",
+    borderRadius: 22,
+    padding: 18,
+    gap: 8,
+  },
+  habitName: {
+    color: "#1F3120",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  helperText: {
+    color: "#7D8B77",
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  emptyCard: {
+    backgroundColor: "#FCFDF9",
+    borderRadius: 24,
+    padding: 20,
+    gap: 8,
+    alignItems: "flex-start",
+  },
+  emptyTitle: {
+    color: "#1F3120",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  emptyText: {
+    color: "#7D8B77",
+    fontSize: 14,
+    lineHeight: 21,
+  },
   modalBackdrop: {
     flex: 1,
     backgroundColor: "rgba(19, 31, 15, 0.35)",
@@ -249,6 +342,15 @@ export const styles = StyleSheet.create({
     padding: 22,
     gap: 14,
   },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  modalHeaderText: {
+    flex: 1,
+  },
   modalTitle: {
     color: "#1F3120",
     fontSize: 24,
@@ -258,6 +360,20 @@ export const styles = StyleSheet.create({
     color: "#7D8B77",
     fontSize: 14,
     lineHeight: 20,
+    marginTop: 6,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: "#ECF2E4",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeButtonText: {
+    color: "#355229",
+    fontSize: 16,
+    fontWeight: "700",
   },
   input: {
     backgroundColor: "#F2F6EC",
@@ -267,17 +383,102 @@ export const styles = StyleSheet.create({
     color: "#1F3120",
     fontSize: 15,
   },
-  modalActions: {
+  multilineInput: {
+    minHeight: 94,
+    textAlignVertical: "top",
+  },
+  optionGroup: {
+    gap: 10,
+  },
+  fieldLabel: {
+    color: "#4A6643",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  optionRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  optionChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: "#ECF2E4",
+  },
+  optionChipActive: {
+    backgroundColor: "#17351A",
+  },
+  optionChipText: {
+    color: "#355229",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  optionChipTextActive: {
+    color: "#F6F8F2",
+  },
+  dropdownField: {
+    gap: 10,
+  },
+  dropdownValue: {
+    backgroundColor: "#F2F6EC",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  dropdownValueText: {
+    color: "#1F3120",
+    fontSize: 15,
+  },
+  dropdownOptions: {
+    gap: 8,
+  },
+  dropdownOption: {
+    backgroundColor: "#ECF2E4",
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  dropdownOptionActive: {
+    backgroundColor: "#17351A",
+  },
+  dropdownOptionText: {
+    color: "#355229",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  dropdownOptionTextActive: {
+    color: "#F6F8F2",
+  },
+  primaryActionFull: {
+    borderRadius: 16,
+    backgroundColor: "#8FCE5A",
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 6,
+  },
+  primaryActionSplit: {
+    flex: 1,
+    borderRadius: 16,
+    backgroundColor: "#8FCE5A",
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  primaryActionText: {
+    color: "#17351A",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  modalFooterRow: {
+    flexDirection: "row",
     gap: 12,
-    marginTop: 8,
+    marginTop: 6,
   },
   secondaryAction: {
     flex: 1,
     borderRadius: 16,
     backgroundColor: "#ECF2E4",
-    paddingVertical: 15,
+    paddingVertical: 16,
     alignItems: "center",
   },
   secondaryActionText: {
@@ -285,16 +486,80 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
   },
-  primaryAction: {
+  bottomNav: {
+    position: "absolute",
+    left: 20,
+    right: 20,
+    bottom: 24,
+    flexDirection: "row",
+    backgroundColor: "#17351A",
+    borderRadius: 24,
+    padding: 8,
+    gap: 8,
+    shadowColor: "#17351A",
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+  },
+  navItem: {
     flex: 1,
-    borderRadius: 16,
-    backgroundColor: "#8FCE5A",
-    paddingVertical: 15,
+    borderRadius: 18,
+    paddingVertical: 14,
     alignItems: "center",
   },
-  primaryActionText: {
-    color: "#17351A",
-    fontSize: 15,
+  navItemActive: {
+    backgroundColor: "#8FCE5A",
+  },
+  navLabel: {
+    color: "#B6D6B0",
+    fontSize: 13,
     fontWeight: "700",
+  },
+  navLabelActive: {
+    color: "#17351A",
+  },
+  fabWrapper: {
+    position: "absolute",
+    right: 24,
+    bottom: 106,
+    alignItems: "flex-end",
+    gap: 10,
+  },
+  fabMenu: {
+    gap: 10,
+  },
+  fabMenuItem: {
+    backgroundColor: "#FCFDF9",
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minWidth: 132,
+    shadowColor: "#17351A",
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  fabMenuLabel: {
+    color: "#1F3120",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  fabButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 22,
+    backgroundColor: "#8FCE5A",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#17351A",
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+  },
+  fabButtonText: {
+    color: "#17351A",
+    fontSize: 30,
+    fontWeight: "400",
+    marginTop: -2,
   },
 });
