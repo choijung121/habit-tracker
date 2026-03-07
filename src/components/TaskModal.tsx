@@ -1,4 +1,6 @@
+import React, { useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, Text, TextInput, View } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 
 import { styles } from "../styles";
 import type { Habit } from "../types";
@@ -34,12 +36,31 @@ export function TaskModal({
   onSubmit,
   onRequestClose,
 }: TaskModalProps) {
-  const selectedHabit = habits.find((habit) => habit.id === selectedHabitId);
+  const [open, setOpen] = useState(false);
+  const items = useMemo(
+    () =>
+      habits.map((habit) => ({
+        label: `${habit.name} · ${habit.category}`,
+        value: habit.id,
+      })),
+    [habits]
+  );
+  const [pickerItems, setPickerItems] = useState(items);
+
+  useEffect(() => {
+    setPickerItems(items);
+  }, [items]);
+
+  useEffect(() => {
+    if (!visible) {
+      setOpen(false);
+    }
+  }, [visible]);
 
   return (
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onRequestClose}>
       <View style={styles.modalBackdrop}>
-        <View style={styles.modalCard}>
+        <View style={[styles.modalCard, open && styles.modalCardExpanded]}>
           <View style={styles.modalHeader}>
             <View style={styles.modalHeaderText}>
               <Text style={styles.modalTitle}>{title}</Text>
@@ -59,34 +80,33 @@ export function TaskModal({
 
           <View style={styles.dropdownField}>
             <Text style={styles.fieldLabel}>Linked habit</Text>
-            <View style={styles.dropdownValue}>
-              <Text style={styles.dropdownValueText}>
-                {selectedHabit ? `${selectedHabit.name} · ${selectedHabit.category}` : "Select a habit"}
-              </Text>
-            </View>
             {habits.length === 0 ? (
               <Text style={styles.helperText}>Add a habit first, then link tasks to it here.</Text>
             ) : (
-              <View style={styles.dropdownOptions}>
-                {habits.map((habit) => (
-                  <Pressable
-                    key={habit.id}
-                    style={[
-                      styles.dropdownOption,
-                      selectedHabitId === habit.id && styles.dropdownOptionActive,
-                    ]}
-                    onPress={() => onSelectHabit(habit.id)}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownOptionText,
-                        selectedHabitId === habit.id && styles.dropdownOptionTextActive,
-                      ]}
-                    >
-                      {habit.name} · {habit.category}
-                    </Text>
-                  </Pressable>
-                ))}
+              <View style={styles.dropdownLayerTop}>
+                <DropDownPicker
+                  open={open}
+                  value={selectedHabitId}
+                  items={pickerItems}
+                  setOpen={setOpen}
+                  setValue={(callback) => {
+                    const nextValue = callback(selectedHabitId);
+                    if (typeof nextValue === "string") {
+                      onSelectHabit(nextValue);
+                    }
+                  }}
+                  setItems={setPickerItems}
+                  placeholder="Select a habit"
+                  listMode="SCROLLVIEW"
+                  style={styles.dropdownPicker}
+                  dropDownContainerStyle={styles.dropdownPickerContainer}
+                  textStyle={styles.dropdownPickerText}
+                  placeholderStyle={styles.dropdownPickerPlaceholder}
+                  ArrowDownIconComponent={() => <Text style={styles.dropdownChevron}>⌄</Text>}
+                  ArrowUpIconComponent={() => <Text style={styles.dropdownChevron}>⌃</Text>}
+                  zIndex={3000}
+                  zIndexInverse={1000}
+                />
               </View>
             )}
           </View>

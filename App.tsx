@@ -8,7 +8,7 @@ import { FloatingActionMenu } from "./src/components/FloatingActionMenu";
 import { HabitModal } from "./src/components/HabitModal";
 import { TaskCard } from "./src/components/TaskCard";
 import { TaskModal } from "./src/components/TaskModal";
-import { INITIAL_HABITS, INITIAL_TASKS } from "./src/constants";
+import { CATEGORY_OPTIONS, INITIAL_HABITS, INITIAL_TASKS } from "./src/constants";
 import { styles } from "./src/styles";
 import type { Habit, HabitTask, TabKey } from "./src/types";
 import { buildCalendarDays, toDateKey } from "./src/utils/habits";
@@ -24,6 +24,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [habits, setHabits] = useState<Habit[]>(INITIAL_HABITS);
   const [tasks, setTasks] = useState<HabitTask[]>(INITIAL_TASKS);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [fabOpen, setFabOpen] = useState(false);
 
   const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
@@ -94,6 +95,16 @@ export default function App() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [habitMap, tasks]);
 
+  const categoryOptions = useMemo(() => {
+    return Array.from(
+      new Set([
+        ...CATEGORY_OPTIONS,
+        ...customCategories,
+        ...habits.map((habit) => habit.category),
+      ])
+    );
+  }, [customCategories, habits]);
+
   const habitActivity = useMemo(() => {
     return habits.map((habit) => {
       const habitTasks = tasks.filter((task) => task.habitId === habit.id);
@@ -120,6 +131,16 @@ export default function App() {
     setNewHabitName("");
     setNewHabitCategory("Exercise");
     setNewHabitTasks("");
+  };
+
+  const addCategoryOption = (value: string) => {
+    const nextCategory = value.trim();
+    if (!nextCategory) return;
+
+    setCustomCategories((current) =>
+      current.includes(nextCategory) ? current : [...current, nextCategory]
+    );
+    setNewHabitCategory(nextCategory);
   };
 
   const closeTaskModal = () => {
@@ -394,9 +415,11 @@ export default function App() {
         visible={isHabitModalOpen}
         habitName={newHabitName}
         category={newHabitCategory}
+        categories={categoryOptions}
         taskNames={newHabitTasks}
         onChangeHabitName={setNewHabitName}
         onChangeCategory={setNewHabitCategory}
+        onAddCategory={addCategoryOption}
         onChangeTaskNames={setNewHabitTasks}
         onSubmit={addHabit}
         onRequestClose={closeHabitModal}

@@ -28,7 +28,7 @@ export function FloatingActionMenu({
         </View>
       ) : null}
       <Pressable style={styles.fabButton} onPress={onToggle}>
-        <Text style={styles.fabButtonText}>{open ? "X" : "+"}</Text>
+        <Text style={styles.fabButtonText}>{open ? "x" : "+"}</Text>
       </Pressable>
     </View>
   );

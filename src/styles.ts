@@ -341,6 +341,10 @@ export const styles = StyleSheet.create({
     borderRadius: 30,
     padding: 22,
     gap: 14,
+    overflow: "visible",
+  },
+  modalCardExpanded: {
+    paddingBottom: 30,
   },
   modalHeader: {
     flexDirection: "row",
@@ -420,6 +424,9 @@ export const styles = StyleSheet.create({
   dropdownField: {
     gap: 10,
   },
+  dropdownLayerTop: {
+    zIndex: 3000,
+  },
   dropdownValue: {
     backgroundColor: "#F2F6EC",
     borderRadius: 16,
@@ -449,6 +456,68 @@ export const styles = StyleSheet.create({
   },
   dropdownOptionTextActive: {
     color: "#F6F8F2",
+  },
+  dropdownPicker: {
+    borderWidth: 0,
+    borderRadius: 16,
+    backgroundColor: "#F2F6EC",
+    minHeight: 54,
+    paddingHorizontal: 4,
+  },
+  dropdownPickerContainer: {
+    borderWidth: 0,
+    borderRadius: 16,
+    backgroundColor: "#FCFDF9",
+    marginTop: 8,
+    shadowColor: "#17351A",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  dropdownPickerText: {
+    color: "#1F3120",
+    fontSize: 15,
+  },
+  dropdownPickerPlaceholder: {
+    color: "#8A957A",
+  },
+  dropdownChevron: {
+    color: "#355229",
+    fontSize: 18,
+    fontWeight: "700",
+    marginRight: 8,
+  },
+  addOptionRow: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+  },
+  addCategoryPanel: {
+    gap: 10,
+    backgroundColor: "#F4F7F1",
+    borderRadius: 18,
+    padding: 12,
+  },
+  addCategoryHint: {
+    color: "#5F7356",
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  addOptionInput: {
+    flex: 1,
+  },
+  addOptionButton: {
+    borderRadius: 16,
+    backgroundColor: "#17351A",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addOptionButtonText: {
+    color: "#F6F8F2",
+    fontSize: 14,
+    fontWeight: "700",
   },
   primaryActionFull: {
     borderRadius: 16,
