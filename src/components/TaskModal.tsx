@@ -15,7 +15,7 @@ type TaskModalProps = {
   submitLabel: string;
   secondaryLabel?: string;
   onChangeName: (value: string) => void;
-  onSelectHabit: (habitId: string) => void;
+  onSelectHabit: (habitId: string | null) => void;
   onSecondaryPress?: () => void;
   onSubmit: () => void;
   onRequestClose: () => void;
@@ -91,9 +91,11 @@ export function TaskModal({
                   setOpen={setOpen}
                   setValue={(callback) => {
                     const nextValue = callback(selectedHabitId);
-                    if (typeof nextValue === "string") {
-                      onSelectHabit(nextValue);
+                    if (nextValue === selectedHabitId) {
+                      onSelectHabit(null);
+                      return;
                     }
+                    onSelectHabit(typeof nextValue === "string" ? nextValue : null);
                   }}
                   setItems={setPickerItems}
                   placeholder="Select a habit"

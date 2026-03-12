@@ -463,6 +463,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#F2F6EC",
     minHeight: 54,
     paddingHorizontal: 4,
+    paddingLeft:16,
   },
   dropdownPickerContainer: {
     borderWidth: 0,
@@ -486,6 +487,7 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginRight: 8,
+    paddingRight: 5,
   },
   addOptionRow: {
     flexDirection: "row",

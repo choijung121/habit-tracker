@@ -114,10 +114,13 @@ export function HabitModal({
               items={pickerItems}
               setOpen={setOpen}
               setValue={(callback) => {
-                const nextValue = callback(category || null);
-                if (typeof nextValue === "string") {
-                  onChangeCategory(nextValue);
+                const currentValue = category || null;
+                const nextValue = callback(currentValue);
+                if (nextValue === category) {
+                  onChangeCategory("");
+                  return;
                 }
+                onChangeCategory(typeof nextValue === "string" ? nextValue : "");
               }}
               setItems={setPickerItems}
               placeholder="Select or add a category"

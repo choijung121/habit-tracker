@@ -1,14 +1,15 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useMemo, useState } from "react";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, View } from "react-native";
 
-import { ActivityGrid } from "./src/components/ActivityGrid";
 import { BottomNav } from "./src/components/BottomNav";
 import { FloatingActionMenu } from "./src/components/FloatingActionMenu";
 import { HabitModal } from "./src/components/HabitModal";
-import { TaskCard } from "./src/components/TaskCard";
 import { TaskModal } from "./src/components/TaskModal";
 import { CATEGORY_OPTIONS, INITIAL_HABITS, INITIAL_TASKS } from "./src/constants";
+import { ActivityScreen } from "./src/screens/ActivityScreen";
+import { OverviewScreen } from "./src/screens/OverviewScreen";
+import { TasksScreen } from "./src/screens/TasksScreen";
 import { styles } from "./src/styles";
 import type { Habit, HabitTask, TabKey } from "./src/types";
 import { buildCalendarDays, toDateKey } from "./src/utils/habits";
@@ -29,14 +30,12 @@ export default function App() {
 
   const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
   const [newHabitName, setNewHabitName] = useState("");
-  const [newHabitCategory, setNewHabitCategory] = useState("Exercise");
+  const [newHabitCategory, setNewHabitCategory] = useState("");
   const [newHabitTasks, setNewHabitTasks] = useState("");
 
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
-  const [selectedHabitId, setSelectedHabitId] = useState<string | null>(
-    INITIAL_HABITS[0]?.id ?? null
-  );
+  const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
 
   const [isEditTaskOpen, setIsEditTaskOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -45,10 +44,9 @@ export default function App() {
 
   const todayKey = toDateKey(new Date());
   const calendarDays = useMemo(() => buildCalendarDays(new Date()), [todayKey]);
-
-  const habitMap = useMemo(() => {
-    return habits.reduce<Record<string, Habit>>((acc, habit) => {
-      acc[habit.id] = habit;
+  const habitCategoryById = useMemo(() => {
+    return habits.reduce<Record<string, string>>((acc, habit) => {
+      acc[habit.id] = habit.category;
       return acc;
     }, {});
   }, [habits]);
@@ -72,28 +70,16 @@ export default function App() {
 
   const completedToday = dailyCounts[todayKey] ?? 0;
 
-  const tasksByCategory = useMemo(() => {
-    const groups: Record<string, HabitTask[]> = {};
-
-    for (const task of tasks) {
-      const category = habitMap[task.habitId]?.category ?? "Unassigned";
-      if (!groups[category]) groups[category] = [];
-      groups[category].push(task);
-    }
-
-    return Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0]));
-  }, [habitMap, tasks]);
-
   const topCategories = useMemo(() => {
     const counts: Record<string, number> = {};
 
     for (const task of tasks) {
-      const category = habitMap[task.habitId]?.category ?? "Unassigned";
+      const category = habitCategoryById[task.habitId] ?? "Unassigned";
       counts[category] = (counts[category] ?? 0) + task.completedDates.length;
     }
 
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  }, [habitMap, tasks]);
+  }, [habitCategoryById, tasks]);
 
   const categoryOptions = useMemo(() => {
     return Array.from(
@@ -105,31 +91,11 @@ export default function App() {
     );
   }, [customCategories, habits]);
 
-  const habitActivity = useMemo(() => {
-    return habits.map((habit) => {
-      const habitTasks = tasks.filter((task) => task.habitId === habit.id);
-      const counts: Record<string, number> = {};
-
-      for (const task of habitTasks) {
-        for (const date of task.completedDates) {
-          counts[date] = (counts[date] ?? 0) + 1;
-        }
-      }
-
-      return {
-        habit,
-        dailyCounts: counts,
-        taskCount: habitTasks.length,
-        completionCount: Object.values(counts).reduce((sum, count) => sum + count, 0),
-      };
-    });
-  }, [habits, tasks]);
-
   const closeHabitModal = () => {
     setIsHabitModalOpen(false);
     setFabOpen(false);
     setNewHabitName("");
-    setNewHabitCategory("Exercise");
+    setNewHabitCategory("");
     setNewHabitTasks("");
   };
 
@@ -147,7 +113,7 @@ export default function App() {
     setIsTaskModalOpen(false);
     setFabOpen(false);
     setNewTaskName("");
-    setSelectedHabitId(habits[0]?.id ?? null);
+    setSelectedHabitId(null);
   };
 
   const closeEditTaskModal = () => {
@@ -160,11 +126,12 @@ export default function App() {
   const openAddHabit = () => {
     setIsHabitModalOpen(true);
     setIsTaskModalOpen(false);
+    setNewHabitCategory("");
     setFabOpen(true);
   };
 
   const openAddTask = () => {
-    setSelectedHabitId(habits[0]?.id ?? null);
+    setSelectedHabitId(null);
     setIsTaskModalOpen(true);
     setIsHabitModalOpen(false);
     setFabOpen(true);
@@ -250,155 +217,33 @@ export default function App() {
     );
   };
 
-  const renderOverviewTab = () => (
-    <>
-      <View style={styles.pageHeader}>
-        <Text style={styles.eyebrow}>Habit Tracker</Text>
-        <Text style={styles.pageTitle}>Overview</Text>
-        <Text style={styles.pageSubtitle}>
-          Use this home tab for quick progress, category coverage, and your active habits.
-        </Text>
-      </View>
-
-      <View style={styles.heroCard}>
-        <Text style={styles.heroTitle}>Overview is the extra tab I recommend.</Text>
-        <Text style={styles.heroSubtitle}>
-          It gives you a fast snapshot before you jump into detailed activity or task management.
-        </Text>
-
-        <View style={styles.statRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{habits.length}</Text>
-            <Text style={styles.statLabel}>Habits</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{tasks.length}</Text>
-            <Text style={styles.statLabel}>Tasks</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{completedToday}</Text>
-            <Text style={styles.statLabel}>Done today</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.summaryGrid}>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>Top category</Text>
-          <Text style={styles.summaryValue}>
-            {topCategories[0]?.[0] ?? "None"}
-          </Text>
-          <Text style={styles.summaryAccent}>
-            {topCategories[0]?.[1] ?? 0} completions so far
-          </Text>
-        </View>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>Total wins</Text>
-          <Text style={styles.summaryValue}>{totalCompletions}</Text>
-          <Text style={styles.summaryAccent}>Across all habits and categories</Text>
-        </View>
-      </View>
-
-      <View style={styles.sectionHeaderStack}>
-        <Text style={styles.sectionTitle}>Habits by category</Text>
-        <Text style={styles.sectionSubtitle}>Exercise, diet, reading, and anything else you add</Text>
-      </View>
-
-      {habits.map((habit) => {
-        const habitTaskCount = tasks.filter((task) => task.habitId === habit.id).length;
-
-        return (
-          <View key={habit.id} style={styles.habitRow}>
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryBadgeText}>{habit.category}</Text>
-            </View>
-            <Text style={styles.habitName}>{habit.name}</Text>
-            <Text style={styles.helperText}>{habitTaskCount} linked task{habitTaskCount === 1 ? "" : "s"}</Text>
-          </View>
-        );
-      })}
-    </>
-  );
-
-  const renderActivityTab = () => (
-    <>
-      <View style={styles.pageHeader}>
-        <Text style={styles.eyebrow}>All Habits</Text>
-        <Text style={styles.pageTitle}>Activity Grid</Text>
-        <Text style={styles.pageSubtitle}>
-          Each habit has its own contribution grid, so Diet, Exercise, Reading, and new habits all stay separate.
-        </Text>
-      </View>
-
-      {habitActivity.map(({ habit, dailyCounts: habitDailyCounts, taskCount, completionCount }) => (
-        <ActivityGrid
-          key={habit.id}
-          calendarDays={calendarDays}
-          dailyCounts={habitDailyCounts}
-          title={habit.name}
-          subtitle={`${habit.category} · ${taskCount} task${taskCount === 1 ? "" : "s"} · ${completionCount} completion${completionCount === 1 ? "" : "s"}`}
-        />
-      ))}
-    </>
-  );
-
-  const renderTasksTab = () => (
-    <>
-      <View style={styles.pageHeader}>
-        <Text style={styles.eyebrow}>Manage</Text>
-        <Text style={styles.pageTitle}>Tasks</Text>
-        <Text style={styles.pageSubtitle}>
-          Browse tasks grouped by category and mark them complete from here.
-        </Text>
-      </View>
-
-      {tasksByCategory.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <Text style={styles.emptyTitle}>No tasks yet</Text>
-          <Text style={styles.emptyText}>
-            Use the floating + button to add a habit or create a task linked to an existing habit.
-          </Text>
-        </View>
-      ) : (
-        tasksByCategory.map(([category, categoryTasks]) => (
-          <View key={category} style={styles.categorySection}>
-            <View style={styles.categoryHeader}>
-              <View style={styles.categoryBadge}>
-                <Text style={styles.categoryBadgeText}>{category}</Text>
-              </View>
-              <Text style={styles.categoryCount}>{categoryTasks.length} tasks</Text>
-            </View>
-
-            {categoryTasks.map((task) => {
-              const habit = habitMap[task.habitId];
-
-              return (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  habitName={habit?.name ?? "Unassigned habit"}
-                  category={habit?.category ?? "Unassigned"}
-                  doneToday={task.completedDates.includes(todayKey)}
-                  onComplete={completeTask}
-                  onEdit={openEditTask}
-                />
-              );
-            })}
-          </View>
-        ))
-      )}
-    </>
-  );
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
 
       <View style={styles.screen}>
         <ScrollView contentContainerStyle={styles.content}>
-          {activeTab === "overview" && renderOverviewTab()}
-          {activeTab === "activity" && renderActivityTab()}
-          {activeTab === "tasks" && renderTasksTab()}
+          {activeTab === "overview" && (
+            <OverviewScreen
+              habits={habits}
+              tasks={tasks}
+              completedToday={completedToday}
+              totalCompletions={totalCompletions}
+              topCategories={topCategories}
+            />
+          )}
+          {activeTab === "activity" && (
+            <ActivityScreen habits={habits} tasks={tasks} calendarDays={calendarDays} />
+          )}
+          {activeTab === "tasks" && (
+            <TasksScreen
+              habits={habits}
+              tasks={tasks}
+              todayKey={todayKey}
+              onCompleteTask={completeTask}
+              onEditTask={openEditTask}
+            />
+          )}
         </ScrollView>
 
         <FloatingActionMenu
