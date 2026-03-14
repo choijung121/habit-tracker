@@ -449,16 +449,58 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 10,
   },
+  colorPickerHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  colorValueText: {
+    flex: 1,
+    color: "#1F3120",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  colorPickerButton: {
+    borderRadius: 14,
+    backgroundColor: "#ECF2E4",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  colorPickerButtonText: {
+    color: "#355229",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  colorPickerPanel: {
+    marginTop: 10,
+    gap: 12,
+    backgroundColor: "#F4F7F1",
+    borderRadius: 18,
+    padding: 12,
+  },
+  colorPickerPanelSquare: {
+    height: 220,
+    borderRadius: 18,
+  },
+  colorPickerSlider: {
+    borderRadius: 999,
+  },
+  colorPickerReadout: {
+    textAlign: "center",
+    color: "#5F7356",
+    fontSize: 13,
+    fontWeight: "600",
+  },
   colorSwatch: {
     width: 32,
     height: 32,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 25,
+    borderWidth: 2,
     borderColor: "rgba(31, 49, 32, 0.12)",
   },
   colorSwatchSelected: {
-    borderWidth: 2,
-    borderColor: "#17351A",
+    borderWidth: 5,
+    borderColor: "#B3E561",
   },
   colorInputRow: {
     flexDirection: "row",
