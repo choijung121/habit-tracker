@@ -1,4 +1,4 @@
-import { GRID_DAYS, SHADE_SCALE } from "../constants";
+import { GRID_DAYS } from "../constants";
 
 export function toDateKey(date: Date) {
   const year = date.getFullYear();
@@ -23,10 +23,11 @@ export function buildCalendarDays(anchorDate: Date) {
   return Array.from({ length: GRID_DAYS }, (_, index) => shiftDate(alignedStart, index));
 }
 
-export function getShadeColor(count: number) {
-  if (count <= 0) return SHADE_SCALE[0];
-  if (count === 1) return SHADE_SCALE[1];
-  if (count === 2) return SHADE_SCALE[2];
-  if (count === 3) return SHADE_SCALE[3];
-  return SHADE_SCALE[4];
+export function getShadeColor(count: number, shadeScale: string[]) {
+  if (shadeScale.length === 0) return "#FFFFFF";
+  if (count <= 0) return shadeScale[0] ?? "#FFFFFF";
+  if (count === 1) return shadeScale[1] ?? shadeScale[0] ?? "#FFFFFF";
+  if (count === 2) return shadeScale[2] ?? shadeScale[shadeScale.length - 1] ?? "#FFFFFF";
+  if (count === 3) return shadeScale[3] ?? shadeScale[shadeScale.length - 1] ?? "#FFFFFF";
+  return shadeScale[4] ?? shadeScale[shadeScale.length - 1] ?? "#FFFFFF";
 }

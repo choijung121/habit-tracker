@@ -6,12 +6,13 @@ import { BottomNav } from "./src/components/BottomNav";
 import { FloatingActionMenu } from "./src/components/FloatingActionMenu";
 import { HabitModal } from "./src/components/HabitModal";
 import { TaskModal } from "./src/components/TaskModal";
-import { CATEGORY_OPTIONS, INITIAL_HABITS, INITIAL_TASKS } from "./src/constants";
+import { CATEGORY_OPTIONS, DEFAULT_HABIT_COLOR, INITIAL_HABITS, INITIAL_TASKS } from "./src/constants";
 import { ActivityScreen } from "./src/screens/ActivityScreen";
 import { OverviewScreen } from "./src/screens/OverviewScreen";
 import { TasksScreen } from "./src/screens/TasksScreen";
 import { styles } from "./src/styles";
 import type { Habit, HabitTask, TabKey } from "./src/types";
+import { toNormalizedHexColor } from "./src/utils/colors";
 import { buildCalendarDays, toDateKey } from "./src/utils/habits";
 
 function parseTaskNames(value: string) {
@@ -31,6 +32,7 @@ export default function App() {
   const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
   const [newHabitName, setNewHabitName] = useState("");
   const [newHabitCategory, setNewHabitCategory] = useState("");
+  const [newHabitColor, setNewHabitColor] = useState(DEFAULT_HABIT_COLOR);
   const [newHabitTasks, setNewHabitTasks] = useState("");
 
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -96,6 +98,7 @@ export default function App() {
     setFabOpen(false);
     setNewHabitName("");
     setNewHabitCategory("");
+    setNewHabitColor(DEFAULT_HABIT_COLOR);
     setNewHabitTasks("");
   };
 
@@ -127,6 +130,7 @@ export default function App() {
     setIsHabitModalOpen(true);
     setIsTaskModalOpen(false);
     setNewHabitCategory("");
+    setNewHabitColor(DEFAULT_HABIT_COLOR);
     setFabOpen(true);
   };
 
@@ -140,6 +144,7 @@ export default function App() {
   const addHabit = () => {
     const name = newHabitName.trim();
     const category = newHabitCategory.trim() || "General";
+    const color = toNormalizedHexColor(newHabitColor) ?? DEFAULT_HABIT_COLOR;
     if (!name) return;
 
     const habitId = `habit-${Date.now()}`;
@@ -147,6 +152,7 @@ export default function App() {
       id: habitId,
       name,
       category,
+      color,
     };
     const seededTasks = parseTaskNames(newHabitTasks).map((taskName, index) => ({
       id: `${habitId}-task-${index}-${Date.now()}`,
@@ -260,10 +266,12 @@ export default function App() {
         visible={isHabitModalOpen}
         habitName={newHabitName}
         category={newHabitCategory}
+        color={newHabitColor}
         categories={categoryOptions}
         taskNames={newHabitTasks}
         onChangeHabitName={setNewHabitName}
         onChangeCategory={setNewHabitCategory}
+        onChangeColor={setNewHabitColor}
         onAddCategory={addCategoryOption}
         onChangeTaskNames={setNewHabitTasks}
         onSubmit={addHabit}

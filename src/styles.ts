@@ -106,6 +106,8 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+    justifyContent: "flex-end",
+    marginTop: 12,
   },
   legendText: {
     color: "#7D8B77",
@@ -124,22 +126,33 @@ export const styles = StyleSheet.create({
   },
   monthRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingLeft: 32,
-    paddingRight: 6,
+    gap: 6,
+    height: 14,
+    marginBottom: 10,
   },
-  monthLabel: {
+  monthLabelSlot: {
+    width: 14,
+    position: "relative",
+  },
+  monthLabelText: {
+    position: "absolute",
+    left: 0,
+    top: -1,
     color: "#91A08B",
     fontSize: 11,
-    minWidth: 18,
+  },
+  monthSpacer: {
+    height: 24,
   },
   calendarRow: {
     flexDirection: "row",
-    marginTop: 10,
+  },
+  dayLabelsColumn: {
+    marginRight: 8,
   },
   dayLabels: {
+    flex: 1,
     justifyContent: "space-between",
-    marginRight: 8,
   },
   dayLabelSlot: {
     height: 14,
@@ -161,6 +174,10 @@ export const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 4,
+  },
+  dayCellEmpty: {
+    width: 14,
+    height: 14,
   },
   categorySection: {
     gap: 12,
@@ -423,6 +440,41 @@ export const styles = StyleSheet.create({
   },
   dropdownField: {
     gap: 10,
+  },
+  colorPickerField: {
+    gap: 10,
+  },
+  colorPickerRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  colorSwatch: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(31, 49, 32, 0.12)",
+  },
+  colorSwatchSelected: {
+    borderWidth: 2,
+    borderColor: "#17351A",
+  },
+  colorInputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  colorPreview: {
+    width: 36,
+    height: 36,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#DDE5D6",
+    backgroundColor: "#FFFFFF",
+  },
+  colorInput: {
+    flex: 1,
   },
   dropdownLayerTop: {
     zIndex: 3000,

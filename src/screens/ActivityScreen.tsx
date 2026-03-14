@@ -44,6 +44,7 @@ export function ActivityScreen({ habits, tasks, calendarDays }: ActivityScreenPr
           key={habit.id}
           calendarDays={calendarDays}
           dailyCounts={dailyCounts}
+          baseColor={habit.color}
           title={habit.name}
           subtitle={`${habit.category} · ${taskCount} task${taskCount === 1 ? "" : "s"} · ${completionCount} completion${completionCount === 1 ? "" : "s"}`}
         />

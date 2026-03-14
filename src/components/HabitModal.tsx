@@ -2,16 +2,20 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, Text, TextInput, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 
+import { DEFAULT_HABIT_COLOR } from "../constants";
 import { styles } from "../styles";
+import { toNormalizedHexColor } from "../utils/colors";
 
 type HabitModalProps = {
   visible: boolean;
   habitName: string;
   category: string;
+  color: string;
   categories: string[];
   taskNames: string;
   onChangeHabitName: (value: string) => void;
   onChangeCategory: (value: string) => void;
+  onChangeColor: (value: string) => void;
   onAddCategory: (value: string) => void;
   onChangeTaskNames: (value: string) => void;
   onSubmit: () => void;
@@ -22,10 +26,12 @@ export function HabitModal({
   visible,
   habitName,
   category,
+  color,
   categories,
   taskNames,
   onChangeHabitName,
   onChangeCategory,
+  onChangeColor,
   onAddCategory,
   onChangeTaskNames,
   onSubmit,
@@ -42,6 +48,20 @@ export function HabitModal({
     [categories]
   );
   const [pickerItems, setPickerItems] = useState(items);
+  const normalizedColor = toNormalizedHexColor(color) ?? DEFAULT_HABIT_COLOR;
+  const colorOptions = useMemo(
+    () => [
+      "#2D5B22",
+      "#16A34A",
+      "#0EA5A4",
+      "#1D4ED8",
+      "#7C3AED",
+      "#B3261E",
+      "#F97316",
+      "#0F172A",
+    ],
+    []
+  );
 
   useEffect(() => {
     setPickerItems(items);
@@ -134,6 +154,40 @@ export function HabitModal({
               zIndex={3000}
               zIndexInverse={1000}
             />
+          </View>
+
+          <View style={styles.colorPickerField}>
+            <Text style={styles.fieldLabel}>Color</Text>
+            <View style={styles.colorPickerRow}>
+              {colorOptions.map((option) => {
+                const isSelected = option.toUpperCase() === normalizedColor.toUpperCase();
+                return (
+                  <Pressable
+                    key={option}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Select color ${option}`}
+                    onPress={() => onChangeColor(option)}
+                    style={[
+                      styles.colorSwatch,
+                      { backgroundColor: option },
+                      isSelected && styles.colorSwatchSelected,
+                    ]}
+                  />
+                );
+              })}
+            </View>
+            <View style={styles.colorInputRow}>
+              <View style={[styles.colorPreview, { backgroundColor: normalizedColor }]} />
+              <TextInput
+                style={[styles.input, styles.colorInput]}
+                value={color}
+                onChangeText={onChangeColor}
+                placeholder="#2D5B22"
+                placeholderTextColor="#8A957A"
+                autoCapitalize="characters"
+              />
+            </View>
+            <Text style={styles.helperText}>Pick a swatch or paste a hex value (e.g. #FF0000).</Text>
           </View>
 
           <TextInput
