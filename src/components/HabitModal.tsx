@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, Text, TextInput, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import ColorPicker, { HueSlider, OpacitySlider, Panel1 } from "reanimated-color-picker";
 
 import { DEFAULT_HABIT_COLOR } from "../constants";
+import { HabitColorPickerModal } from "./HabitColorPickerModal";
 import { styles } from "../styles";
 import { toNormalizedHexColor } from "../utils/colors";
 
@@ -51,8 +51,6 @@ export function HabitModal({
   );
   const [pickerItems, setPickerItems] = useState(items);
   const normalizedColor = toNormalizedHexColor(color) ?? DEFAULT_HABIT_COLOR;
-  const [draftColor, setDraftColor] = useState(normalizedColor);
-  const [draftHsla, setDraftHsla] = useState<string | null>(null);
   const colorOptions = useMemo(
     () => [
       "#2D5B22",
@@ -78,13 +76,6 @@ export function HabitModal({
     }
   }, [visible]);
 
-  useEffect(() => {
-    if (!isColorPickerOpen) {
-      setDraftColor(normalizedColor);
-      setDraftHsla(null);
-    }
-  }, [isColorPickerOpen, normalizedColor]);
-
   const handleAddCategory = () => {
     const value = newCategory.trim();
     if (!value) return;
@@ -97,25 +88,21 @@ export function HabitModal({
   const openColorPicker = () => {
     setOpen(false);
     setIsColorPickerOpen(true);
-    setDraftColor(normalizedColor);
-    setDraftHsla(null);
   };
 
   const cancelColorPicker = () => {
     setIsColorPickerOpen(false);
-    setDraftColor(normalizedColor);
-    setDraftHsla(null);
   };
 
-  const applyColorPicker = () => {
-    onChangeColor(draftColor);
+  const applyColorPicker = (nextColor: string) => {
+    onChangeColor(nextColor);
     setIsColorPickerOpen(false);
   };
 
   return (
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onRequestClose}>
       <View style={styles.modalBackdrop}>
-        <View style={[styles.modalCard, (open || isColorPickerOpen) && styles.modalCardExpanded]}>
+        <View style={[styles.modalCard, open && styles.modalCardExpanded]}>
           <View style={styles.modalHeader}>
             <View style={styles.modalHeaderText}>
               <Text style={styles.modalTitle}>Add Habit</Text>
@@ -190,64 +177,30 @@ export function HabitModal({
             <View style={styles.colorPickerHeaderRow}>
               <View style={[styles.colorPreview, { backgroundColor: normalizedColor }]} />
               <Text style={styles.colorValueText}>{normalizedColor}</Text>
-              <Pressable
-                style={styles.colorPickerButton}
-                onPress={isColorPickerOpen ? cancelColorPicker : openColorPicker}
-              >
-                <Text style={styles.colorPickerButtonText}>
-                  {isColorPickerOpen ? "Close" : "Pick color"}
-                </Text>
+              <Pressable style={styles.colorPickerButton} onPress={openColorPicker}>
+                <Text style={styles.colorPickerButtonText}>Pick color</Text>
               </Pressable>
             </View>
 
-            {!isColorPickerOpen ? (
-              <View style={styles.colorPickerRow}>
-                {colorOptions.map((option) => {
-                  const isSelected = option.toUpperCase() === normalizedColor.toUpperCase();
-                  return (
-                    <Pressable
-                      key={option}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Select color ${option}`}
-                      onPress={() => onChangeColor(option)}
-                      style={[
-                        styles.colorSwatch,
-                        { backgroundColor: option },
-                        isSelected && styles.colorSwatchSelected,
-                      ]}
-                    />
-                  );
-                })}
-                <Text style={styles.helperText}>Or tap “Pick color” for a custom shade.</Text>
-              </View>
-            ) : (
-              <View style={styles.colorPickerPanel}>
-                <ColorPicker
-                  value={draftColor}
-                  onChangeJS={(colors) => {
-                    setDraftColor(colors.hex);
-                    setDraftHsla(colors.hsla);
-                  }}
-                >
-                  <Panel1 style={styles.colorPickerPanelSquare} />
-                  <HueSlider style={styles.colorPickerSlider} />
-                  <OpacitySlider style={styles.colorPickerSlider} />
-                </ColorPicker>
-
-                <Text style={styles.colorPickerReadout}>
-                  {draftHsla ?? `hex(${draftColor})`}
-                </Text>
-
-                <View style={styles.modalFooterRow}>
-                  <Pressable style={styles.secondaryAction} onPress={cancelColorPicker}>
-                    <Text style={styles.secondaryActionText}>Cancel</Text>
-                  </Pressable>
-                  <Pressable style={styles.primaryActionSplit} onPress={applyColorPicker}>
-                    <Text style={styles.primaryActionText}>Use color</Text>
-                  </Pressable>
-                </View>
-              </View>
-            )}
+            <View style={styles.colorPickerRow}>
+              {colorOptions.map((option) => {
+                const isSelected = option.toUpperCase() === normalizedColor.toUpperCase();
+                return (
+                  <Pressable
+                    key={option}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Select color ${option}`}
+                    onPress={() => onChangeColor(option)}
+                    style={[
+                      styles.colorSwatch,
+                      { backgroundColor: option },
+                      isSelected && styles.colorSwatchSelected,
+                    ]}
+                  />
+                );
+              })}
+              <Text style={styles.helperText}>Use a swatch or pick a custom shade.</Text>
+            </View>
           </View>
 
           <TextInput
@@ -264,6 +217,13 @@ export function HabitModal({
           </Pressable>
         </View>
       </View>
+
+      <HabitColorPickerModal
+        visible={isColorPickerOpen}
+        color={normalizedColor}
+        onCancel={cancelColorPicker}
+        onSubmit={applyColorPicker}
+      />
     </Modal>
   );
 }

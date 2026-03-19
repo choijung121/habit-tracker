@@ -104,7 +104,7 @@ export function ActivityGrid({
               <View style={styles.monthRow}>
                 {monthLabels.map((label, index) => (
                   <View key={`${label}-${index}`} style={styles.monthLabelSlot}>
-                    <Text style={styles.monthLabelText}>
+                    <Text style={styles.monthLabelText} numberOfLines={1} ellipsizeMode="clip">
                       {index > 0 && monthLabels[index - 1] === label ? "" : label}
                     </Text>
                   </View>

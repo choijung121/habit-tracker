@@ -29,10 +29,10 @@ export function OverviewScreen({
       />
 
       <View style={styles.heroCard}>
-        <Text style={styles.heroTitle}>Overview is the extra tab I recommend.</Text>
-        <Text style={styles.heroSubtitle}>
+        <Text style={styles.heroTitle}>Overview</Text>
+        {/* <Text style={styles.heroSubtitle}>
           It gives you a fast snapshot before you jump into detailed activity or task management.
-        </Text>
+        </Text> */}
 
         <View style={styles.statRow}>
           <View style={styles.statCard}>

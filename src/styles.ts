@@ -138,6 +138,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     top: -1,
+    width: 40,
     color: "#91A08B",
     fontSize: 11,
   },
@@ -354,7 +355,7 @@ export const styles = StyleSheet.create({
     padding: 18,
   },
   modalCard: {
-    backgroundColor: "#FCFDF9",
+    backgroundColor: "#fcfdf9",
     borderRadius: 30,
     padding: 22,
     gap: 14,
@@ -474,22 +475,43 @@ export const styles = StyleSheet.create({
   colorPickerPanel: {
     marginTop: 10,
     gap: 12,
-    backgroundColor: "#F4F7F1",
-    borderRadius: 18,
+    backgroundColor: "#eaece9",
+    borderRadius: 8,
     padding: 12,
   },
+  colorPickerModalCard: {
+    maxHeight: "85%",
+  },
+  colorPickerModalHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
   colorPickerPanelSquare: {
-    height: 220,
-    borderRadius: 18,
+    height: 250,
+    borderRadius: 8,
   },
   colorPickerSlider: {
-    borderRadius: 999,
+    borderRadius: 50,
+    overflow: "hidden",
+    backgroundColor: "transparent",
   },
   colorPickerReadout: {
-    textAlign: "center",
+    textAlign: "left",
     color: "#5F7356",
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "600",
+    marginTop: 6,
+  },
+  colorPickerThumbRing: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    borderWidth: 2,
+    backgroundColor: "transparent",
+  },
+  colorPickerThumbFill: {
+    position: "absolute",
   },
   colorSwatch: {
     width: 32,
