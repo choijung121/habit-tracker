@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Modal, Pressable, Text, TextInput, View } from "react-native";
+import { Modal, Pressable, SafeAreaView, ScrollView, Text, TextInput, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 
 import { styles } from "../styles";
@@ -40,7 +40,7 @@ export function TaskModal({
   const items = useMemo(
     () =>
       habits.map((habit) => ({
-        label: `${habit.name} · ${habit.category}`,
+        label: `${habit.icon ? `${habit.icon} ` : ""}${habit.name} · ${habit.category}`,
         value: habit.id,
       })),
     [habits]
@@ -58,77 +58,92 @@ export function TaskModal({
   }, [visible]);
 
   return (
-    <Modal animationType="slide" transparent visible={visible} onRequestClose={onRequestClose}>
-      <View style={styles.modalBackdrop}>
-        <View style={[styles.modalCard, open && styles.modalCardExpanded]}>
-          <View style={styles.modalHeader}>
-            <View style={styles.modalHeaderText}>
-              <Text style={styles.modalTitle}>{title}</Text>
-              <Text style={styles.modalSubtitle}>{subtitle}</Text>
+    <Modal
+      animationType="slide"
+      visible={visible}
+      presentationStyle="fullScreen"
+      onRequestClose={onRequestClose}
+    >
+      <SafeAreaView style={styles.modalFullScreen}>
+        <View style={styles.modalTopBar}>
+          <Pressable style={styles.modalTopIconButton} onPress={onRequestClose}>
+            <Text style={styles.modalTopIconText}>X</Text>
+          </Pressable>
+          <Text style={styles.modalTopTitle}>{title}</Text>
+          <Pressable style={styles.modalTopIconButton} onPress={onSubmit}>
+            <Text style={styles.modalTopIconText}>✓</Text>
+          </Pressable>
+        </View>
+
+        <ScrollView
+          contentContainerStyle={styles.modalScrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.modalLeadText}>{subtitle}</Text>
+
+          <View style={styles.modalSectionCard}>
+            <TextInput
+              style={styles.input}
+              value={nameValue}
+              onChangeText={onChangeName}
+              placeholder="Task name"
+              placeholderTextColor="#8A957A"
+            />
+
+            <View style={styles.dropdownField}>
+              <Text style={styles.fieldLabel}>Linked habit</Text>
+              {habits.length === 0 ? (
+                <Text style={styles.helperText}>
+                  Add a habit first, then link tasks to it here.
+                </Text>
+              ) : (
+                <View style={styles.dropdownLayerTop}>
+                  <DropDownPicker
+                    open={open}
+                    value={selectedHabitId}
+                    items={pickerItems}
+                    setOpen={setOpen}
+                    setValue={(callback) => {
+                      const nextValue = callback(selectedHabitId);
+                      if (nextValue === selectedHabitId) {
+                        onSelectHabit(null);
+                        return;
+                      }
+                      onSelectHabit(typeof nextValue === "string" ? nextValue : null);
+                    }}
+                    setItems={setPickerItems}
+                    placeholder="Select a habit"
+                    listMode="SCROLLVIEW"
+                    style={styles.dropdownPicker}
+                    dropDownContainerStyle={styles.dropdownPickerContainer}
+                    textStyle={styles.dropdownPickerText}
+                    placeholderStyle={styles.dropdownPickerPlaceholder}
+                    ArrowDownIconComponent={() => <Text style={styles.dropdownChevron}>⌄</Text>}
+                    ArrowUpIconComponent={() => <Text style={styles.dropdownChevron}>⌃</Text>}
+                    zIndex={3000}
+                    zIndexInverse={1000}
+                  />
+                </View>
+              )}
             </View>
-            <Pressable style={styles.closeButton} onPress={onRequestClose}>
-              <Text style={styles.closeButtonText}>X</Text>
-            </Pressable>
-          </View>
-          <TextInput
-            style={styles.input}
-            value={nameValue}
-            onChangeText={onChangeName}
-            placeholder="Task name"
-            placeholderTextColor="#8A957A"
-          />
 
-          <View style={styles.dropdownField}>
-            <Text style={styles.fieldLabel}>Linked habit</Text>
-            {habits.length === 0 ? (
-              <Text style={styles.helperText}>Add a habit first, then link tasks to it here.</Text>
-            ) : (
-              <View style={styles.dropdownLayerTop}>
-                <DropDownPicker
-                  open={open}
-                  value={selectedHabitId}
-                  items={pickerItems}
-                  setOpen={setOpen}
-                  setValue={(callback) => {
-                    const nextValue = callback(selectedHabitId);
-                    if (nextValue === selectedHabitId) {
-                      onSelectHabit(null);
-                      return;
-                    }
-                    onSelectHabit(typeof nextValue === "string" ? nextValue : null);
-                  }}
-                  setItems={setPickerItems}
-                  placeholder="Select a habit"
-                  listMode="SCROLLVIEW"
-                  style={styles.dropdownPicker}
-                  dropDownContainerStyle={styles.dropdownPickerContainer}
-                  textStyle={styles.dropdownPickerText}
-                  placeholderStyle={styles.dropdownPickerPlaceholder}
-                  ArrowDownIconComponent={() => <Text style={styles.dropdownChevron}>⌄</Text>}
-                  ArrowUpIconComponent={() => <Text style={styles.dropdownChevron}>⌃</Text>}
-                  zIndex={3000}
-                  zIndexInverse={1000}
-                />
+            {secondaryLabel && onSecondaryPress ? (
+              <View style={styles.modalFooterRow}>
+                <Pressable style={styles.secondaryAction} onPress={onSecondaryPress}>
+                  <Text style={styles.secondaryActionText}>{secondaryLabel}</Text>
+                </Pressable>
+                <Pressable style={styles.primaryActionSplit} onPress={onSubmit}>
+                  <Text style={styles.primaryActionText}>{submitLabel}</Text>
+                </Pressable>
               </View>
-            )}
-          </View>
-
-          {secondaryLabel && onSecondaryPress ? (
-            <View style={styles.modalFooterRow}>
-              <Pressable style={styles.secondaryAction} onPress={onSecondaryPress}>
-                <Text style={styles.secondaryActionText}>{secondaryLabel}</Text>
-              </Pressable>
-              <Pressable style={styles.primaryActionSplit} onPress={onSubmit}>
+            ) : (
+              <Pressable style={styles.primaryActionFull} onPress={onSubmit}>
                 <Text style={styles.primaryActionText}>{submitLabel}</Text>
               </Pressable>
-            </View>
-          ) : (
-            <Pressable style={styles.primaryActionFull} onPress={onSubmit}>
-              <Text style={styles.primaryActionText}>{submitLabel}</Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </Modal>
   );
 }

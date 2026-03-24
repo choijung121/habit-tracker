@@ -1,20 +1,34 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { styles } from "../styles";
 
 type PageHeaderProps = {
-  eyebrow: string;
   title: string;
-  subtitle: string;
+  onBack?: () => void;
+  backLabel?: string;
 };
 
-export function PageHeader({ eyebrow, title, subtitle }: PageHeaderProps) {
+export function PageHeader({ title, onBack, backLabel = "Back" }: PageHeaderProps) {
   return (
     <View style={styles.pageHeader}>
-      <Text style={styles.eyebrow}>{eyebrow}</Text>
+      {onBack ? (
+        <Pressable
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && styles.backButtonPressed,
+          ]}
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel={backLabel}
+        >
+          <Text style={styles.backButtonText}>‹</Text>
+          <Text style={styles.backButtonLabel} numberOfLines={1}>
+            {backLabel}
+          </Text>
+        </Pressable>
+      ) : null}
+
       <Text style={styles.pageTitle}>{title}</Text>
-      <Text style={styles.pageSubtitle}>{subtitle}</Text>
     </View>
   );
 }
-

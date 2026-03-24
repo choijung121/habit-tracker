@@ -1,4 +1,4 @@
-import type { Habit, HabitTask, TabKey } from "./types";
+import type { Habit, HabitTask } from "./types";
 import { buildShadeScale } from "./utils/colors";
 
 export const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -8,16 +8,16 @@ export const SHADE_SCALE = (baseColor: string) => buildShadeScale(baseColor);
 export const CATEGORY_OPTIONS = ["Exercise", "Diet", "Reading", "Learning", "Creative"];
 export const DEFAULT_HABIT_COLOR = "#2D5B22";
 
-export const NAV_ITEMS: Array<{ key: TabKey; label: string }> = [
-  { key: "overview", label: "Overview" },
-  { key: "activity", label: "Activity" },
-  { key: "tasks", label: "Tasks" },
-];
-
 export const INITIAL_HABITS: Habit[] = [
-  { id: "habit-1", name: "Morning Wellness", category: "Exercise", color: "#2D5B22" },
-  { id: "habit-2", name: "Fuel Better", category: "Diet", color: "#B3261E" },
-  { id: "habit-3", name: "Night Reading", category: "Reading", color: "#1D4ED8" },
+  {
+    id: "habit-1",
+    name: "Morning Wellness",
+    category: "Exercise",
+    color: "#2D5B22",
+    icon: "🏃‍♂️",
+  },
+  { id: "habit-2", name: "Fuel Better", category: "Diet", color: "#B3261E", icon: "🥗" },
+  { id: "habit-3", name: "Night Reading", category: "Reading", color: "#1D4ED8", icon: "📚" },
 ];
 
 export const INITIAL_TASKS: HabitTask[] = [

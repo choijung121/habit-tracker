@@ -4,16 +4,15 @@ import { StatusBar } from "expo-status-bar";
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
 
-import { BottomNav } from "./src/components/BottomNav";
 import { FloatingActionMenu } from "./src/components/FloatingActionMenu";
 import { HabitModal } from "./src/components/HabitModal";
+import { PageHeader } from "./src/components/PageHeader";
 import { TaskModal } from "./src/components/TaskModal";
 import { CATEGORY_OPTIONS, DEFAULT_HABIT_COLOR, INITIAL_HABITS, INITIAL_TASKS } from "./src/constants";
-import { ActivityScreen } from "./src/screens/ActivityScreen";
+import { HabitScreen } from "./src/screens/HabitScreen";
 import { OverviewScreen } from "./src/screens/OverviewScreen";
-import { TasksScreen } from "./src/screens/TasksScreen";
 import { styles } from "./src/styles";
-import type { Habit, HabitTask, TabKey } from "./src/types";
+import type { Habit, HabitTask } from "./src/types";
 import { toNormalizedHexColor } from "./src/utils/colors";
 import { buildCalendarDays, toDateKey } from "./src/utils/habits";
 
@@ -25,7 +24,9 @@ function parseTaskNames(value: string) {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabKey>("overview");
+  const [route, setRoute] = useState<{ name: "overview" } | { name: "habit"; habitId: string }>({
+    name: "overview",
+  });
   const [habits, setHabits] = useState<Habit[]>(INITIAL_HABITS);
   const [tasks, setTasks] = useState<HabitTask[]>(INITIAL_TASKS);
   const [customCategories, setCustomCategories] = useState<string[]>([]);
@@ -33,6 +34,7 @@ export default function App() {
 
   const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
   const [newHabitName, setNewHabitName] = useState("");
+  const [newHabitIcon, setNewHabitIcon] = useState("");
   const [newHabitCategory, setNewHabitCategory] = useState("");
   const [newHabitColor, setNewHabitColor] = useState(DEFAULT_HABIT_COLOR);
   const [newHabitTasks, setNewHabitTasks] = useState("");
@@ -48,12 +50,6 @@ export default function App() {
 
   const todayKey = toDateKey(new Date());
   const calendarDays = useMemo(() => buildCalendarDays(new Date()), [todayKey]);
-  const habitCategoryById = useMemo(() => {
-    return habits.reduce<Record<string, string>>((acc, habit) => {
-      acc[habit.id] = habit.category;
-      return acc;
-    }, {});
-  }, [habits]);
 
   const dailyCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -74,17 +70,6 @@ export default function App() {
 
   const completedToday = dailyCounts[todayKey] ?? 0;
 
-  const topCategories = useMemo(() => {
-    const counts: Record<string, number> = {};
-
-    for (const task of tasks) {
-      const category = habitCategoryById[task.habitId] ?? "Unassigned";
-      counts[category] = (counts[category] ?? 0) + task.completedDates.length;
-    }
-
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  }, [habitCategoryById, tasks]);
-
   const categoryOptions = useMemo(() => {
     return Array.from(
       new Set([
@@ -99,6 +84,7 @@ export default function App() {
     setIsHabitModalOpen(false);
     setFabOpen(false);
     setNewHabitName("");
+    setNewHabitIcon("");
     setNewHabitCategory("");
     setNewHabitColor(DEFAULT_HABIT_COLOR);
     setNewHabitTasks("");
@@ -131,13 +117,14 @@ export default function App() {
   const openAddHabit = () => {
     setIsHabitModalOpen(true);
     setIsTaskModalOpen(false);
+    setNewHabitIcon("");
     setNewHabitCategory("");
     setNewHabitColor(DEFAULT_HABIT_COLOR);
     setFabOpen(true);
   };
 
   const openAddTask = () => {
-    setSelectedHabitId(null);
+    setSelectedHabitId(route.name === "habit" ? route.habitId : null);
     setIsTaskModalOpen(true);
     setIsHabitModalOpen(false);
     setFabOpen(true);
@@ -155,6 +142,7 @@ export default function App() {
       name,
       category,
       color,
+      icon: newHabitIcon.trim(),
     };
     const seededTasks = parseTaskNames(newHabitTasks).map((taskName, index) => ({
       id: `${habitId}-task-${index}-${Date.now()}`,
@@ -167,7 +155,7 @@ export default function App() {
     if (seededTasks.length > 0) {
       setTasks((current) => [...seededTasks, ...current]);
     }
-    setSelectedHabitId(habitId);
+    setRoute({ name: "habit", habitId });
     closeHabitModal();
   };
 
@@ -225,34 +213,49 @@ export default function App() {
     );
   };
 
+  const activeHabit = useMemo(() => {
+    if (route.name !== "habit") return null;
+    return habits.find((habit) => habit.id === route.habitId) ?? null;
+  }, [habits, route]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
 
       <View style={styles.screen}>
-        <ScrollView contentContainerStyle={styles.content}>
-          {activeTab === "overview" && (
+        {route.name === "overview" ? (
+          <ScrollView contentContainerStyle={styles.content}>
             <OverviewScreen
               habits={habits}
               tasks={tasks}
+              calendarDays={calendarDays}
+              dailyCounts={dailyCounts}
               completedToday={completedToday}
               totalCompletions={totalCompletions}
-              topCategories={topCategories}
+              onSelectHabit={(habitId) => setRoute({ name: "habit", habitId })}
             />
-          )}
-          {activeTab === "activity" && (
-            <ActivityScreen habits={habits} tasks={tasks} calendarDays={calendarDays} />
-          )}
-          {activeTab === "tasks" && (
-            <TasksScreen
-              habits={habits}
-              tasks={tasks}
-              todayKey={todayKey}
-              onCompleteTask={completeTask}
-              onEditTask={openEditTask}
-            />
-          )}
-        </ScrollView>
+          </ScrollView>
+        ) : activeHabit ? (
+          <>
+            <View style={styles.stickyHeaderContainer}>
+              <PageHeader
+                title={`${activeHabit.icon ? `${activeHabit.icon} ` : ""}${activeHabit.name}`}
+                onBack={() => setRoute({ name: "overview" })}
+                backLabel="Overview"
+              />
+            </View>
+            <ScrollView contentContainerStyle={styles.contentBelowStickyHeader}>
+              <HabitScreen
+                habit={activeHabit}
+                tasks={tasks.filter((task) => task.habitId === activeHabit.id)}
+                calendarDays={calendarDays}
+                todayKey={todayKey}
+                onCompleteTask={completeTask}
+                onEditTask={openEditTask}
+              />
+            </ScrollView>
+          </>
+        ) : null}
 
         <FloatingActionMenu
           open={fabOpen}
@@ -260,18 +263,18 @@ export default function App() {
           onAddHabit={openAddHabit}
           onAddTask={openAddTask}
         />
-
-        <BottomNav activeTab={activeTab} onChange={setActiveTab} />
       </View>
 
       <HabitModal
         visible={isHabitModalOpen}
         habitName={newHabitName}
+        icon={newHabitIcon}
         category={newHabitCategory}
         color={newHabitColor}
         categories={categoryOptions}
         taskNames={newHabitTasks}
         onChangeHabitName={setNewHabitName}
+        onChangeIcon={setNewHabitIcon}
         onChangeCategory={setNewHabitCategory}
         onChangeColor={setNewHabitColor}
         onAddCategory={addCategoryOption}

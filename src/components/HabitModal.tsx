@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Modal, Pressable, Text, TextInput, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Keyboard, Modal, Pressable, SafeAreaView, ScrollView, Text, TextInput, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 
 import { DEFAULT_HABIT_COLOR } from "../constants";
@@ -10,11 +10,13 @@ import { toNormalizedHexColor } from "../utils/colors";
 type HabitModalProps = {
   visible: boolean;
   habitName: string;
+  icon: string;
   category: string;
   color: string;
   categories: string[];
   taskNames: string;
   onChangeHabitName: (value: string) => void;
+  onChangeIcon: (value: string) => void;
   onChangeCategory: (value: string) => void;
   onChangeColor: (value: string) => void;
   onAddCategory: (value: string) => void;
@@ -26,11 +28,13 @@ type HabitModalProps = {
 export function HabitModal({
   visible,
   habitName,
+  icon,
   category,
   color,
   categories,
   taskNames,
   onChangeHabitName,
+  onChangeIcon,
   onChangeCategory,
   onChangeColor,
   onAddCategory,
@@ -41,6 +45,8 @@ export function HabitModal({
   const [open, setOpen] = useState(false);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [emojiDraft, setEmojiDraft] = useState("");
+  const emojiInputRef = useRef<TextInput | null>(null);
   const items = useMemo(
     () =>
       categories.map((option) => ({
@@ -73,6 +79,8 @@ export function HabitModal({
       setOpen(false);
       setIsColorPickerOpen(false);
       setNewCategory("");
+      setEmojiDraft("");
+      Keyboard.dismiss();
     }
   }, [visible]);
 
@@ -99,124 +107,126 @@ export function HabitModal({
     setIsColorPickerOpen(false);
   };
 
+  const focusEmojiKeyboard = () => {
+    setOpen(false);
+    emojiInputRef.current?.focus();
+  };
+
   return (
-    <Modal animationType="slide" transparent visible={visible} onRequestClose={onRequestClose}>
-      <View style={styles.modalBackdrop}>
-        <View style={[styles.modalCard, open && styles.modalCardExpanded]}>
-          <View style={styles.modalHeader}>
-            <View style={styles.modalHeaderText}>
-              <Text style={styles.modalTitle}>Add Habit</Text>
-              <Text style={styles.modalSubtitle}>
-                Create a habit category and optionally seed it with tasks.
-              </Text>
-            </View>
-            <Pressable style={styles.closeButton} onPress={onRequestClose}>
-              <Text style={styles.closeButtonText}>X</Text>
-            </Pressable>
-          </View>
-
-          <TextInput
-            style={styles.input}
-            value={habitName}
-            onChangeText={onChangeHabitName}
-            placeholder="Habit name"
-            placeholderTextColor="#8A957A"
-          />
-
-          <View style={[styles.dropdownField, styles.dropdownLayerTop]}>
-            <Text style={styles.fieldLabel}>Category</Text>
-            {open ? (
-              <View style={styles.addCategoryPanel}>
-                <Text style={styles.addCategoryHint}>
-                  Pick an existing category below or add a new one here.
-                </Text>
-                <View style={styles.addOptionRow}>
-                  <TextInput
-                    style={[styles.input, styles.addOptionInput]}
-                    value={newCategory}
-                    onChangeText={setNewCategory}
-                    placeholder="Add a new category"
-                    placeholderTextColor="#8A957A"
-                  />
-                  <Pressable style={styles.addOptionButton} onPress={handleAddCategory}>
-                    <Text style={styles.addOptionButtonText}>Add</Text>
-                  </Pressable>
-                </View>
-              </View>
-            ) : null}
-            <DropDownPicker
-              open={open}
-              value={category || null}
-              items={pickerItems}
-              setOpen={setOpen}
-              setValue={(callback) => {
-                const currentValue = category || null;
-                const nextValue = callback(currentValue);
-                if (nextValue === category) {
-                  onChangeCategory("");
-                  return;
-                }
-                onChangeCategory(typeof nextValue === "string" ? nextValue : "");
-              }}
-              setItems={setPickerItems}
-              placeholder="Select or add a category"
-              listMode="SCROLLVIEW"
-              style={styles.dropdownPicker}
-              dropDownContainerStyle={styles.dropdownPickerContainer}
-              textStyle={styles.dropdownPickerText}
-              placeholderStyle={styles.dropdownPickerPlaceholder}
-              ArrowDownIconComponent={() => <Text style={styles.dropdownChevron}>⌄</Text>}
-              ArrowUpIconComponent={() => <Text style={styles.dropdownChevron}>⌃</Text>}
-              zIndex={3000}
-              zIndexInverse={1000}
-            />
-          </View>
-
-          <View style={styles.colorPickerField}>
-            <Text style={styles.fieldLabel}>Color</Text>
-            <View style={styles.colorPickerHeaderRow}>
-              <View style={[styles.colorPreview, { backgroundColor: normalizedColor }]} />
-              <Text style={styles.colorValueText}>{normalizedColor}</Text>
-              <Pressable style={styles.colorPickerButton} onPress={openColorPicker}>
-                <Text style={styles.colorPickerButtonText}>Pick color</Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.colorPickerRow}>
-              {colorOptions.map((option) => {
-                const isSelected = option.toUpperCase() === normalizedColor.toUpperCase();
-                return (
-                  <Pressable
-                    key={option}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Select color ${option}`}
-                    onPress={() => onChangeColor(option)}
-                    style={[
-                      styles.colorSwatch,
-                      { backgroundColor: option },
-                      isSelected && styles.colorSwatchSelected,
-                    ]}
-                  />
-                );
-              })}
-              <Text style={styles.helperText}>Use a swatch or pick a custom shade.</Text>
-            </View>
-          </View>
-
-          <TextInput
-            style={[styles.input, styles.multilineInput]}
-            value={taskNames}
-            onChangeText={onChangeTaskNames}
-            placeholder="Add tasks separated by commas"
-            placeholderTextColor="#8A957A"
-            multiline
-          />
-
-          <Pressable style={styles.primaryActionFull} onPress={onSubmit}>
-            <Text style={styles.primaryActionText}>Save Habit</Text>
+    <Modal
+      animationType="slide"
+      visible={visible}
+      presentationStyle="fullScreen"
+      onRequestClose={onRequestClose}
+    >
+      <SafeAreaView style={styles.modalFullScreen}>
+        <View style={styles.modalTopBar}>
+          <Pressable style={styles.modalTopIconButton} onPress={onRequestClose}>
+            <Text style={styles.modalTopIconText}>X</Text>
+          </Pressable>
+          <Text style={styles.modalTopTitle}>Add Habit</Text>
+          <Pressable style={styles.modalTopIconButton} onPress={onSubmit}>
+            <Text style={styles.modalTopIconText}>✓</Text>
           </Pressable>
         </View>
-      </View>
+
+        <ScrollView
+          contentContainerStyle={styles.modalScrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.modalLeadText}>
+            Create a habit category and optionally seed it with tasks.
+          </Text>
+
+          <View style={styles.modalSectionCard}>
+            <View style={styles.habitNameRow}>
+              <Pressable
+                style={styles.habitIconButton}
+                onPress={focusEmojiKeyboard}
+                accessibilityRole="button"
+                accessibilityLabel="Choose habit icon"
+              >
+                <Text style={styles.habitIconText}>{icon || "🙂"}</Text>
+              </Pressable>
+
+              <TextInput
+                ref={emojiInputRef}
+                style={styles.hiddenEmojiInput}
+                value={emojiDraft}
+                onChangeText={(value) => {
+                  setEmojiDraft(value);
+                  const next = value.trim();
+                  if (!next) return;
+
+                  onChangeIcon(next);
+                  setEmojiDraft("");
+                  emojiInputRef.current?.blur();
+                }}
+                autoCorrect={false}
+                autoCapitalize="none"
+                maxLength={12}
+                blurOnSubmit
+                onSubmitEditing={() => {
+                  setEmojiDraft("");
+                  emojiInputRef.current?.blur();
+                }}
+              />
+
+              <TextInput
+                style={[styles.input, styles.habitNameInput]}
+                value={habitName}
+                onChangeText={onChangeHabitName}
+                placeholder="Habit name"
+                placeholderTextColor="#8A957A"
+              />
+            </View>
+
+            <View style={styles.colorPickerField}>
+              <Text style={styles.fieldLabel}>Color</Text>
+              <View style={styles.colorPickerHeaderRow}>
+                <View style={[styles.colorPreview, { backgroundColor: normalizedColor }]} />
+                <Text style={styles.colorValueText}>{normalizedColor}</Text>
+                <Pressable style={styles.colorPickerButton} onPress={openColorPicker}>
+                  <Text style={styles.colorPickerButtonText}>Pick color</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.colorPickerRow}>
+                {colorOptions.map((option) => {
+                  const isSelected = option.toUpperCase() === normalizedColor.toUpperCase();
+                  return (
+                    <Pressable
+                      key={option}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Select color ${option}`}
+                      onPress={() => onChangeColor(option)}
+                      style={[
+                        styles.colorSwatch,
+                        { backgroundColor: option },
+                        isSelected && styles.colorSwatchSelected,
+                      ]}
+                    />
+                  );
+                })}
+                <Text style={styles.helperText}>Use a swatch or pick a custom shade.</Text>
+              </View>
+            </View>
+
+            <TextInput
+              style={[styles.input, styles.multilineInput]}
+              value={taskNames}
+              onChangeText={onChangeTaskNames}
+              placeholder="Add tasks separated by commas"
+              placeholderTextColor="#8A957A"
+              multiline
+            />
+
+            <Pressable style={styles.primaryActionFull} onPress={onSubmit}>
+              <Text style={styles.primaryActionText}>Save Habit</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
 
       <HabitColorPickerModal
         visible={isColorPickerOpen}

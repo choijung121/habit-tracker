@@ -3,6 +3,7 @@ export type Habit = {
   name: string;
   category: string;
   color: string;
+  icon: string;
 };
 
 export type HabitTask = {
@@ -11,5 +12,3 @@ export type HabitTask = {
   habitId: string;
   completedDates: string[];
 };
-
-export type TabKey = "overview" | "activity" | "tasks";

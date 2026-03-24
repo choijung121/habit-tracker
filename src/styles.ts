@@ -8,14 +8,52 @@ export const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
+  stickyHeaderContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
+    backgroundColor: "#F4F7F1",
+    zIndex: 10,
+  },
   content: {
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 150,
+    paddingBottom: 120,
+    gap: 18,
+  },
+  contentBelowStickyHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 120,
     gap: 18,
   },
   pageHeader: {
     gap: 8,
+  },
+  backButton: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    backgroundColor: "#ECF2E4",
+  },
+  backButtonPressed: {
+    opacity: 0.75,
+  },
+  backButtonText: {
+    color: "#355229",
+    fontSize: 20,
+    fontWeight: "800",
+    marginTop: -2,
+  },
+  backButtonLabel: {
+    color: "#355229",
+    fontSize: 13,
+    fontWeight: "700",
+    maxWidth: 220,
   },
   eyebrow: {
     color: "#7B8D72",
@@ -63,6 +101,8 @@ export const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
+    flexBasis: 0,
+    minWidth: 0,
     backgroundColor: "#244A28",
     borderRadius: 18,
     paddingVertical: 14,
@@ -90,6 +130,7 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
   sectionHeaderStack: {
+    marginTop: 15,
     gap: 2,
   },
   sectionTitle: {
@@ -288,38 +329,17 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: -6,
   },
-  summaryGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-  },
-  summaryCard: {
-    width: "47%",
-    backgroundColor: "#FCFDF9",
-    borderRadius: 22,
-    padding: 18,
-    gap: 8,
-  },
-  summaryLabel: {
-    color: "#7D8B77",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  summaryValue: {
-    color: "#1F3120",
-    fontSize: 26,
-    fontWeight: "700",
-  },
-  summaryAccent: {
-    color: "#4C6D42",
-    fontSize: 13,
-    lineHeight: 18,
-  },
   habitRow: {
     backgroundColor: "#FCFDF9",
     borderRadius: 22,
     padding: 18,
     gap: 8,
+  },
+  habitRowPressable: {
+    opacity: 1,
+  },
+  habitRowPressed: {
+    opacity: 0.75,
   },
   habitName: {
     color: "#1F3120",
@@ -348,6 +368,103 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
   },
+  modalFullScreen: {
+    flex: 1,
+    backgroundColor: "#F4F7F1",
+  },
+  modalTopBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 10,
+  },
+  modalTopIconButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: "#FCFDF9",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalTopIconText: {
+    color: "#1F3120",
+    fontSize: 18,
+    fontWeight: "800",
+    marginTop: -2,
+  },
+  modalTopTitle: {
+    flex: 1,
+    textAlign: "center",
+    color: "#1F3120",
+    fontSize: 18,
+    fontWeight: "800",
+  },
+  modalScrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 34,
+    gap: 14,
+  },
+  modalLeadText: {
+    color: "#7D8B77",
+    fontSize: 15,
+    lineHeight: 22,
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  modalSectionCard: {
+    backgroundColor: "#FCFDF9",
+    borderRadius: 28,
+    padding: 18,
+    gap: 14,
+  },
+  habitNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  habitIconButton: {
+    width: 54,
+    height: 54,
+    borderRadius: 18,
+    backgroundColor: "#F2F6EC",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  habitIconText: {
+    fontSize: 26,
+  },
+  habitNameInput: {
+    flex: 1,
+  },
+  hiddenEmojiInput: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    opacity: 0,
+    left: -100,
+    top: -100,
+  },
+  emojiGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  emojiCell: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: "#F2F6EC",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emojiCellSelected: {
+    backgroundColor: "#17351A",
+  },
+  emojiCellText: {
+    fontSize: 26,
+  },
   modalBackdrop: {
     flex: 1,
     backgroundColor: "rgba(19, 31, 15, 0.35)",
@@ -355,7 +472,7 @@ export const styles = StyleSheet.create({
     padding: 18,
   },
   modalCard: {
-    backgroundColor: "#fcfdf9",
+    backgroundColor: "#FCFDF9",
     borderRadius: 30,
     padding: 22,
     gap: 14,
@@ -673,42 +790,10 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
   },
-  bottomNav: {
-    position: "absolute",
-    left: 20,
-    right: 20,
-    bottom: 24,
-    flexDirection: "row",
-    backgroundColor: "#17351A",
-    borderRadius: 24,
-    padding: 8,
-    gap: 8,
-    shadowColor: "#17351A",
-    shadowOpacity: 0.18,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-  },
-  navItem: {
-    flex: 1,
-    borderRadius: 18,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  navItemActive: {
-    backgroundColor: "#8FCE5A",
-  },
-  navLabel: {
-    color: "#B6D6B0",
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  navLabelActive: {
-    color: "#17351A",
-  },
   fabWrapper: {
     position: "absolute",
     right: 24,
-    bottom: 106,
+    bottom: 24,
     alignItems: "flex-end",
     gap: 10,
   },
