@@ -123,11 +123,20 @@ export default function App() {
     setFabOpen(true);
   };
 
-  const openAddTask = () => {
-    setSelectedHabitId(route.name === "habit" ? route.habitId : null);
+  const openAddTaskFromOverview = () => {
+    setSelectedHabitId(null);
     setIsTaskModalOpen(true);
     setIsHabitModalOpen(false);
     setFabOpen(true);
+  };
+
+  const openAddTaskFromHabit = () => {
+    if (route.name !== "habit") return;
+
+    setSelectedHabitId(route.habitId);
+    setIsTaskModalOpen(true);
+    setIsHabitModalOpen(false);
+    setFabOpen(false);
   };
 
   const addHabit = () => {
@@ -232,7 +241,10 @@ export default function App() {
               dailyCounts={dailyCounts}
               completedToday={completedToday}
               totalCompletions={totalCompletions}
-              onSelectHabit={(habitId) => setRoute({ name: "habit", habitId })}
+              onSelectHabit={(habitId) => {
+                setFabOpen(false);
+                setRoute({ name: "habit", habitId });
+              }}
             />
           </ScrollView>
         ) : activeHabit ? (
@@ -240,7 +252,10 @@ export default function App() {
             <View style={styles.stickyHeaderContainer}>
               <PageHeader
                 title={`${activeHabit.icon ? `${activeHabit.icon} ` : ""}${activeHabit.name}`}
-                onBack={() => setRoute({ name: "overview" })}
+                onBack={() => {
+                  setFabOpen(false);
+                  setRoute({ name: "overview" });
+                }}
                 backLabel="Overview"
               />
             </View>
@@ -257,12 +272,16 @@ export default function App() {
           </>
         ) : null}
 
-        <FloatingActionMenu
-          open={fabOpen}
-          onToggle={() => setFabOpen((current) => !current)}
-          onAddHabit={openAddHabit}
-          onAddTask={openAddTask}
-        />
+        {route.name === "overview" ? (
+          <FloatingActionMenu
+            open={fabOpen}
+            onToggle={() => setFabOpen((current) => !current)}
+            onAddHabit={openAddHabit}
+            onAddTask={openAddTaskFromOverview}
+          />
+        ) : (
+          <FloatingActionMenu variant="quickAddTask" onAddTask={openAddTaskFromHabit} />
+        )}
       </View>
 
       <HabitModal

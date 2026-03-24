@@ -2,33 +2,46 @@ import { Pressable, Text, View } from "react-native";
 
 import { styles } from "../styles";
 
-type FloatingActionMenuProps = {
+type FloatingActionMenuMenuProps = {
+  variant?: "menu";
   open: boolean;
   onToggle: () => void;
   onAddHabit: () => void;
   onAddTask: () => void;
 };
 
-export function FloatingActionMenu({
-  open,
-  onToggle,
-  onAddHabit,
-  onAddTask,
-}: FloatingActionMenuProps) {
+type FloatingActionMenuQuickAddTaskProps = {
+  variant: "quickAddTask";
+  onAddTask: () => void;
+};
+
+type FloatingActionMenuProps = FloatingActionMenuMenuProps | FloatingActionMenuQuickAddTaskProps;
+
+export function FloatingActionMenu(props: FloatingActionMenuProps) {
+  if (props.variant === "quickAddTask") {
+    return (
+      <View style={styles.fabWrapper}>
+        <Pressable style={styles.fabButton} onPress={props.onAddTask}>
+          <Text style={styles.fabButtonText}>+</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.fabWrapper}>
-      {open ? (
+      {props.open ? (
         <View style={styles.fabMenu}>
-          <Pressable style={styles.fabMenuItem} onPress={onAddHabit}>
+          <Pressable style={styles.fabMenuItem} onPress={props.onAddHabit}>
             <Text style={styles.fabMenuLabel}>Add Habit</Text>
           </Pressable>
-          <Pressable style={styles.fabMenuItem} onPress={onAddTask}>
+          <Pressable style={styles.fabMenuItem} onPress={props.onAddTask}>
             <Text style={styles.fabMenuLabel}>Add Task</Text>
           </Pressable>
         </View>
       ) : null}
-      <Pressable style={styles.fabButton} onPress={onToggle}>
-        <Text style={styles.fabButtonText}>{open ? "x" : "+"}</Text>
+      <Pressable style={styles.fabButton} onPress={props.onToggle}>
+        <Text style={styles.fabButtonText}>{props.open ? "x" : "+"}</Text>
       </Pressable>
     </View>
   );
