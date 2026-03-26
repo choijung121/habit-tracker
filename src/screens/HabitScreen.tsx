@@ -47,7 +47,7 @@ export function HabitScreen({
         dailyCounts={dailyCounts}
         baseColor={habit.color}
         title="Activity"
-        subtitle={`${habit.category} · ${tasks.length} task${tasks.length === 1 ? "" : "s"} · ${completionCount} win${
+        subtitle={`${tasks.length} task${tasks.length === 1 ? "" : "s"} · ${completionCount} win${
           completionCount === 1 ? "" : "s"
         }`}
       />

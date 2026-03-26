@@ -75,7 +75,7 @@ export default function App() {
       new Set([
         ...CATEGORY_OPTIONS,
         ...customCategories,
-        ...habits.map((habit) => habit.category),
+        // ...habits.map((habit) => habit.category),
       ])
     );
   }, [customCategories, habits]);
@@ -141,7 +141,7 @@ export default function App() {
 
   const addHabit = () => {
     const name = newHabitName.trim();
-    const category = newHabitCategory.trim() || "General";
+    // const category = newHabitCategory.trim() || "General";
     const color = toNormalizedHexColor(newHabitColor) ?? DEFAULT_HABIT_COLOR;
     if (!name) return;
 
@@ -149,7 +149,7 @@ export default function App() {
     const createdHabit: Habit = {
       id: habitId,
       name,
-      category,
+      // category,
       color,
       icon: newHabitIcon.trim(),
     };
@@ -210,11 +210,15 @@ export default function App() {
     closeEditTaskModal();
   };
 
-  const completeTask = (taskId: string) => {
+  const toggleTaskCompletion = (taskId: string) => {
     setTasks((current) =>
       current.map((task) => {
-        if (task.id !== taskId || task.completedDates.includes(todayKey)) {
+        if (task.id !== taskId) {
           return task;
+        }
+
+        if (task.completedDates.includes(todayKey)) {
+          return { ...task, completedDates: task.completedDates.filter((date) => date !== todayKey) };
         }
 
         return { ...task, completedDates: [...task.completedDates, todayKey] };
@@ -265,7 +269,7 @@ export default function App() {
                 tasks={tasks.filter((task) => task.habitId === activeHabit.id)}
                 calendarDays={calendarDays}
                 todayKey={todayKey}
-                onCompleteTask={completeTask}
+                onCompleteTask={toggleTaskCompletion}
                 onEditTask={openEditTask}
               />
             </ScrollView>

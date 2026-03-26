@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 
 import type { HabitTask } from "../types";
 import { styles } from "../styles";
+import { RadioButton } from "./RadioButton";
 
 type TaskCardProps = {
   task: HabitTask;
@@ -18,6 +19,11 @@ export function TaskCard({
 }: TaskCardProps) {
   return (
     <View style={styles.taskCard}>
+      <RadioButton
+        selected={doneToday}
+        onPress={() => onComplete(task.id)}
+      />
+
       <View style={styles.taskInfo}>
         <Text style={styles.taskTitle}>{task.title}</Text>
         <Text style={styles.taskMeta}>
@@ -25,24 +31,9 @@ export function TaskCard({
         </Text>
       </View>
 
-      <View style={styles.taskActions}>
-        <Pressable
-          style={[styles.completeButton, doneToday && styles.completeButtonDone]}
-          onPress={() => onComplete(task.id)}
-        >
-          <Text
-            style={[
-              styles.completeButtonText,
-              doneToday && styles.completeButtonTextDone,
-            ]}
-          >
-            {doneToday ? "Done" : "Complete"}
-          </Text>
-        </Pressable>
-        <Pressable style={styles.ellipsisButton} onPress={() => onEdit(task)}>
-          <Text style={styles.ellipsisText}>...</Text>
-        </Pressable>
-      </View>
+      <Pressable style={styles.ellipsisButton} onPress={() => onEdit(task)}>
+        <Text style={styles.ellipsisText}>...</Text>
+      </Pressable>
     </View>
   );
 }

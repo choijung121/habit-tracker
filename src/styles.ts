@@ -253,7 +253,7 @@ export const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 18,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
     gap: 14,
   },
@@ -292,29 +292,6 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 6,
   },
-  taskActions: {
-    alignItems: "center",
-    gap: 10,
-  },
-  completeButton: {
-    minWidth: 92,
-    borderRadius: 14,
-    backgroundColor: "#17351A",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    alignItems: "center",
-  },
-  completeButtonDone: {
-    backgroundColor: "#DCE9D1",
-  },
-  completeButtonText: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  completeButtonTextDone: {
-    color: "#33502A",
-  },
   ellipsisButton: {
     width: 42,
     height: 42,
@@ -328,6 +305,38 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginTop: -6,
+  },
+  radioButtonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  radioButtonPressed: {
+    opacity: 0.75,
+  },
+  radioButtonOuter: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 2,
+    borderColor: "#17351A",
+    backgroundColor: "#F2F6EC",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radioButtonSelected: {
+    backgroundColor: "#17351A",
+  },
+  radioButtonInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#8FCE5A",
+  },
+  radioButtonLabel: {
+    color: "#1F3120",
+    fontSize: 14,
+    fontWeight: "700",
   },
   habitRow: {
     backgroundColor: "#FCFDF9",

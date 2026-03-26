@@ -19,6 +19,9 @@
       "adaptiveIcon": {
         "backgroundColor": "#F4F7F1"
       }
-    }
+    },
+    "plugins": [
+      "expo-sqlite"
+    ]
   }
 }
