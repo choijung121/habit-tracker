@@ -1,14 +1,24 @@
 import "react-native-gesture-handler";
 
 import { StatusBar } from "expo-status-bar";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
 
 import { FloatingActionMenu } from "./src/components/FloatingActionMenu";
 import { HabitModal } from "./src/components/HabitModal";
 import { PageHeader } from "./src/components/PageHeader";
 import { TaskModal } from "./src/components/TaskModal";
-import { CATEGORY_OPTIONS, DEFAULT_HABIT_COLOR, INITIAL_HABITS, INITIAL_TASKS } from "./src/constants";
+import { CATEGORY_OPTIONS, DEFAULT_HABIT_COLOR } from "./src/constants";
+import {
+  archiveTask,
+  createHabitWithSeedTasks,
+  createTask,
+  getAllHabits,
+  getAllTasksWithCompletedDates,
+  initializeDatabase,
+  toggleTaskCompletion as toggleTaskCompletionInDb,
+  updateTask,
+} from "./src/db";
 import { HabitScreen } from "./src/screens/HabitScreen";
 import { OverviewScreen } from "./src/screens/OverviewScreen";
 import { styles } from "./src/styles";
@@ -27,10 +37,11 @@ export default function App() {
   const [route, setRoute] = useState<{ name: "overview" } | { name: "habit"; habitId: string }>({
     name: "overview",
   });
-  const [habits, setHabits] = useState<Habit[]>(INITIAL_HABITS);
-  const [tasks, setTasks] = useState<HabitTask[]>(INITIAL_TASKS);
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [tasks, setTasks] = useState<HabitTask[]>([]);
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [fabOpen, setFabOpen] = useState(false);
+  const [isDbReady, setIsDbReady] = useState(false);
 
   const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
   const [newHabitName, setNewHabitName] = useState("");
@@ -50,6 +61,35 @@ export default function App() {
 
   const todayKey = toDateKey(new Date());
   const calendarDays = useMemo(() => buildCalendarDays(new Date()), [todayKey]);
+
+  const refreshData = async () => {
+    const [nextHabits, nextTasks] = await Promise.all([
+      getAllHabits(),
+      getAllTasksWithCompletedDates(),
+    ]);
+    setHabits(nextHabits);
+    setTasks(nextTasks);
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        await initializeDatabase();
+        if (cancelled) return;
+        await refreshData();
+        if (cancelled) return;
+        setIsDbReady(true);
+      } catch (error) {
+        console.error("Failed to initialize database", error);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const dailyCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -75,7 +115,7 @@ export default function App() {
       new Set([
         ...CATEGORY_OPTIONS,
         ...customCategories,
-        // ...habits.map((habit) => habit.category),
+        ...habits.map((habit) => habit.category),
       ])
     );
   }, [customCategories, habits]);
@@ -141,47 +181,33 @@ export default function App() {
 
   const addHabit = () => {
     const name = newHabitName.trim();
-    // const category = newHabitCategory.trim() || "General";
+    const category = newHabitCategory.trim() || "General";
     const color = toNormalizedHexColor(newHabitColor) ?? DEFAULT_HABIT_COLOR;
     if (!name) return;
 
-    const habitId = `habit-${Date.now()}`;
-    const createdHabit: Habit = {
-      id: habitId,
-      name,
-      // category,
-      color,
-      icon: newHabitIcon.trim(),
-    };
-    const seededTasks = parseTaskNames(newHabitTasks).map((taskName, index) => ({
-      id: `${habitId}-task-${index}-${Date.now()}`,
-      title: taskName,
-      habitId,
-      completedDates: [],
-    }));
-
-    setHabits((current) => [createdHabit, ...current]);
-    if (seededTasks.length > 0) {
-      setTasks((current) => [...seededTasks, ...current]);
-    }
-    setRoute({ name: "habit", habitId });
-    closeHabitModal();
+    void (async () => {
+      const { habitId } = await createHabitWithSeedTasks({
+        name,
+        category,
+        color,
+        icon: newHabitIcon.trim(),
+        taskTitles: parseTaskNames(newHabitTasks),
+      });
+      await refreshData();
+      setRoute({ name: "habit", habitId });
+      closeHabitModal();
+    })();
   };
 
   const addTask = () => {
     const title = newTaskName.trim();
     if (!title || !selectedHabitId) return;
 
-    setTasks((current) => [
-      {
-        id: `task-${Date.now()}`,
-        title,
-        habitId: selectedHabitId,
-        completedDates: [],
-      },
-      ...current,
-    ]);
-    closeTaskModal();
+    void (async () => {
+      await createTask({ habitId: selectedHabitId, title });
+      await refreshData();
+      closeTaskModal();
+    })();
   };
 
   const openEditTask = (task: HabitTask) => {
@@ -195,35 +221,28 @@ export default function App() {
     const title = editTaskName.trim();
     if (!editingTaskId || !title || !editHabitId) return;
 
-    setTasks((current) =>
-      current.map((task) =>
-        task.id === editingTaskId ? { ...task, title, habitId: editHabitId } : task
-      )
-    );
-    closeEditTaskModal();
+    void (async () => {
+      await updateTask({ taskId: editingTaskId, title, habitId: editHabitId });
+      await refreshData();
+      closeEditTaskModal();
+    })();
   };
 
   const deleteTask = () => {
     if (!editingTaskId) return;
 
-    setTasks((current) => current.filter((task) => task.id !== editingTaskId));
-    closeEditTaskModal();
+    void (async () => {
+      await archiveTask(editingTaskId);
+      await refreshData();
+      closeEditTaskModal();
+    })();
   };
 
   const toggleTaskCompletion = (taskId: string) => {
-    setTasks((current) =>
-      current.map((task) => {
-        if (task.id !== taskId) {
-          return task;
-        }
-
-        if (task.completedDates.includes(todayKey)) {
-          return { ...task, completedDates: task.completedDates.filter((date) => date !== todayKey) };
-        }
-
-        return { ...task, completedDates: [...task.completedDates, todayKey] };
-      })
-    );
+    void (async () => {
+      await toggleTaskCompletionInDb(taskId, todayKey);
+      await refreshData();
+    })();
   };
 
   const activeHabit = useMemo(() => {
@@ -302,7 +321,10 @@ export default function App() {
         onChangeColor={setNewHabitColor}
         onAddCategory={addCategoryOption}
         onChangeTaskNames={setNewHabitTasks}
-        onSubmit={addHabit}
+        onSubmit={() => {
+          if (!isDbReady) return;
+          addHabit();
+        }}
         onRequestClose={closeHabitModal}
       />
 
@@ -316,7 +338,10 @@ export default function App() {
         submitLabel="Save Task"
         onChangeName={setNewTaskName}
         onSelectHabit={setSelectedHabitId}
-        onSubmit={addTask}
+        onSubmit={() => {
+          if (!isDbReady) return;
+          addTask();
+        }}
         onRequestClose={closeTaskModal}
       />
 
@@ -331,8 +356,14 @@ export default function App() {
         secondaryLabel="Delete"
         onChangeName={setEditTaskName}
         onSelectHabit={setEditHabitId}
-        onSecondaryPress={deleteTask}
-        onSubmit={saveTask}
+        onSecondaryPress={() => {
+          if (!isDbReady) return;
+          deleteTask();
+        }}
+        onSubmit={() => {
+          if (!isDbReady) return;
+          saveTask();
+        }}
         onRequestClose={closeEditTaskModal}
       />
     </SafeAreaView>
